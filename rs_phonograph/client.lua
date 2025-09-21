@@ -312,15 +312,6 @@ AddEventHandler('rs_phonograph:client:placePropPhonograph', function()
     end)
 end)
 
-RegisterNetEvent('rs_phonograph:client:removePhonograph')
-AddEventHandler('rs_phonograph:client:removePhonograph', function(uniqueId)
-    local entity = phonographEntities[uniqueId]
-    if entity and DoesEntityExist(entity) then
-        DeleteObject(entity)
-    end
-    phonographEntities[uniqueId] = nil
-end)
-
 local function getSoundName(uniqueId)
     return tostring(uniqueId)
 end
