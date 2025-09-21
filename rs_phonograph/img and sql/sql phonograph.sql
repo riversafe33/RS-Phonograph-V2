@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `phonographs` (
   `rot_y` double DEFAULT NULL,
   `rot_z` double DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+);
 
 
 INSERT IGNORE INTO `items` (`item`, `label`, `limit`, `can_remove`, `type`, `usable`, `metadata`, `desc`, `weight`) VALUES
