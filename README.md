@@ -1,3 +1,7 @@
+To improve my PC and continue offering things
+
+https://ko-fi.com/riversafe33
+
 rs_phonograph V2
 
 Dependency
