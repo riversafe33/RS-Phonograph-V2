@@ -340,12 +340,12 @@ AddEventHandler('rs_phonograph:client:playMusic', function(uniqueId, coords, url
     }
 
     exports.xsound:PlayUrlPos(soundName, url, volume, coords, looped)
-    exports.xsound:Distance(soundName, 10)
+    exports.xsound:Distance(soundName, Config.SoundDistance)
 
     if Config.WithEffect then
         local effectVolume = volume * Config.VolumeEffect
         exports.xsound:PlayUrlPos(effectSoundName, "https://www.youtube.com/watch?v=m5Mz9Tqs9CE", effectVolume, coords, looped)
-        exports.xsound:Distance(effectSoundName, 10)
+        exports.xsound:Distance(effectSoundName, Config.SoundDistance)
     end
 
     if exports.xsound.onPlayEnd then
@@ -356,12 +356,12 @@ AddEventHandler('rs_phonograph:client:playMusic', function(uniqueId, coords, url
             if data.loop then
 
                 exports.xsound:PlayUrlPos(soundName, data.url, data.volume, data.coords, true)
-                exports.xsound:Distance(soundName, 10)
+                exports.xsound:Distance(soundName, Config.SoundDistance)
 
                 if Config.WithEffect then
                     local effectVolume = data.volume * Config.VolumeEffect
                     exports.xsound:PlayUrlPos(effectSoundName, "https://www.youtube.com/watch?v=m5Mz9Tqs9CE", effectVolume, data.coords, true)
-                    exports.xsound:Distance(effectSoundName, 10)
+                    exports.xsound:Distance(effectSoundName, Config.SoundDistance)
                 end
             else
 
@@ -411,11 +411,11 @@ AddEventHandler('rs_phonograph:client:toggleLoop', function(uniqueId, state)
             local data = currentlyPlaying[uniqueId]
             if data then
                 exports.xsound:PlayUrlPos(soundName, data.url, data.volume, data.coords, true)
-                exports.xsound:Distance(soundName, 10)
+                exports.xsound:Distance(soundName, Config.SoundDistance)
                 if Config.WithEffect then
                     local effectVolume = data.volume * Config.VolumeEffect
                     exports.xsound:PlayUrlPos(effectSoundName, "https://www.youtube.com/watch?v=m5Mz9Tqs9CE", effectVolume, data.coords, true)
-                    exports.xsound:Distance(effectSoundName, 10)
+                    exports.xsound:Distance(effectSoundName, Config.SoundDistance)
                 end
             end
         end
@@ -436,9 +436,9 @@ end)
 RegisterNetEvent('rs_phonograph:client:notifyLoop')
 AddEventHandler('rs_phonograph:client:notifyLoop', function(state)
     if state then
-        TriggerEvent("vorp:NotifyLeft", Config.Notify.Phono, Config.Notify.LoopOnMessage, "generic_textures", "tick", 1000, "COLOR_GREEN")
+        TriggerEvent("vorp:NotifyLeft", Config.Notify.Phono, Config.Notify.LoopOnMessage, "generic_textures", "tick", 3000, "COLOR_GREEN")
     else
-        TriggerEvent("vorp:NotifyLeft", Config.Notify.Phono, Config.Notify.LoopOffMessage, "menu_textures", "cross", 1000, "COLOR_RED")
+        TriggerEvent("vorp:NotifyLeft", Config.Notify.Phono, Config.Notify.LoopOffMessage, "menu_textures", "cross", 3000, "COLOR_RED")
     end
 end)
 
