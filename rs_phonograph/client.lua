@@ -312,12 +312,6 @@ local function getSoundName(uniqueId)
     return tostring(uniqueId)
 end
 
-local currentlyPlaying = {}
-
-local function getSoundName(uniqueId)
-    return tostring(uniqueId)
-end
-
 RegisterNetEvent('rs_phonograph:client:playMusic')
 AddEventHandler('rs_phonograph:client:playMusic', function(uniqueId, coords, url, volume, loop, timeStamp)
     local soundName = getSoundName(uniqueId)
@@ -389,13 +383,6 @@ AddEventHandler('rs_phonograph:client:playMusic', function(uniqueId, coords, url
         end)
     end
 end)
-
--- Solicitar sincronización al entrar
-RegisterNetEvent("vorp:SelectedCharacter")
-AddEventHandler("vorp:SelectedCharacter", function()
-    TriggerServerEvent('rs_phonograph:server:syncMusic')
-end)
-
 
 RegisterNetEvent("vorp:SelectedCharacter")
 AddEventHandler("vorp:SelectedCharacter", function()
