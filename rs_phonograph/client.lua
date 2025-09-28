@@ -1,4 +1,3 @@
-local currentlyPlaying = {}
 local volume = 0.3
 local loopEnabled = false
 local nuiOpen = false
@@ -307,12 +306,20 @@ AddEventHandler('rs_phonograph:client:placePropPhonograph', function()
     end)
 end)
 
+local currentlyPlaying = {}
+
+local function getSoundName(uniqueId)
+    return tostring(uniqueId)
+end
+
+local currentlyPlaying = {}
+
 local function getSoundName(uniqueId)
     return tostring(uniqueId)
 end
 
 RegisterNetEvent('rs_phonograph:client:playMusic')
-AddEventHandler('rs_phonograph:client:playMusic', function(uniqueId, coords, url, volume, loop)
+AddEventHandler('rs_phonograph:client:playMusic', function(uniqueId, coords, url, volume, loop, timeStamp)
     local soundName = getSoundName(uniqueId)
     local effectSoundName = soundName .. "_effect"
     local looped = loop or false
@@ -324,18 +331,29 @@ AddEventHandler('rs_phonograph:client:playMusic', function(uniqueId, coords, url
         if Config.WithEffect and exports.xsound:soundExists(effectSoundName) then
             pcall(function() exports.xsound:Destroy(effectSoundName) end)
         end
-        currentlyPlaying[uniqueId] = nil
     end
 
     currentlyPlaying[uniqueId] = {
         url = url,
         volume = volume,
         coords = coords,
-        loop = looped
+        loop = looped,
+        timeStamp = timeStamp or 0
     }
 
     exports.xsound:PlayUrlPos(soundName, url, volume, coords, looped)
     exports.xsound:Distance(soundName, Config.SoundDistance)
+
+    if timeStamp and timeStamp > 0 then
+        Citizen.CreateThread(function()
+            Citizen.Wait(500)
+            if exports.xsound:soundExists(soundName) then
+                pcall(function()
+                    exports.xsound:setTimeStamp(soundName, timeStamp)
+                end)
+            end
+        end)
+    end
 
     if Config.WithEffect then
         local effectVolume = volume * Config.VolumeEffect
@@ -350,8 +368,8 @@ AddEventHandler('rs_phonograph:client:playMusic', function(uniqueId, coords, url
 
             if data.loop then
 
-                exports.xsound:PlayUrlPos(soundName, data.url, data.volume, data.coords, true)
-                exports.xsound:Distance(soundName, Config.SoundDistance)
+                TriggerServerEvent('rs_phonograph:server:resetLoop', uniqueId)
+                currentlyPlaying[uniqueId].timeStamp = 0
 
                 if Config.WithEffect then
                     local effectVolume = data.volume * Config.VolumeEffect
@@ -359,7 +377,6 @@ AddEventHandler('rs_phonograph:client:playMusic', function(uniqueId, coords, url
                     exports.xsound:Distance(effectSoundName, Config.SoundDistance)
                 end
             else
-
                 if Config.WithEffect and exports.xsound:soundExists(effectSoundName) then
                     pcall(function() exports.xsound:Destroy(effectSoundName) end)
                 end
@@ -371,6 +388,18 @@ AddEventHandler('rs_phonograph:client:playMusic', function(uniqueId, coords, url
             end
         end)
     end
+end)
+
+-- Solicitar sincronización al entrar
+RegisterNetEvent("vorp:SelectedCharacter")
+AddEventHandler("vorp:SelectedCharacter", function()
+    TriggerServerEvent('rs_phonograph:server:syncMusic')
+end)
+
+
+RegisterNetEvent("vorp:SelectedCharacter")
+AddEventHandler("vorp:SelectedCharacter", function()
+    TriggerServerEvent('rs_phonograph:server:syncMusic')
 end)
 
 RegisterNetEvent('rs_phonograph:client:stopMusic')
@@ -452,5 +481,17 @@ AddEventHandler('rs_phonograph:client:setVolume', function(uniqueId, newVolume)
 
     if currentlyPlaying[uniqueId] then
         currentlyPlaying[uniqueId].volume = newVolume
+    end
+end)
+
+AddEventHandler('onResourceStop', function(resourceName)
+    if resourceName == GetCurrentResourceName() then
+        for uniqueId, entity in pairs(phonographEntities) do
+            if entity and DoesEntityExist(entity) then
+                DeleteObject(entity)
+            end
+        end
+        phonographEntities = {}
+        phonographData = {}
     end
 end)
