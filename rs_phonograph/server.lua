@@ -47,16 +47,6 @@ AddEventHandler('rs_phonograph:server:toggleLoop', function(uniqueId, state)
     TriggerClientEvent('rs_phonograph:client:notifyLoop', src, state)
 end)
 
-
-RegisterServerEvent('rs_phonograph:server:sendCurrentMusic')
-AddEventHandler('rs_phonograph:server:sendCurrentMusic', function()
-    local src = source
-
-    for uniqueId, musicData in pairs(currentlyPlaying) do
-        TriggerClientEvent('rs_phonograph:client:playMusic', src, uniqueId, musicData.coords, musicData.url, musicData.volume, musicData.loop)
-    end
-end)
-
 local loadedPhonographs = {}
 
 AddEventHandler('onResourceStart', function(resource)
