@@ -3,21 +3,28 @@ local VorpInv = exports.vorp_inventory:vorp_inventoryApi()
 local currentlyPlaying = {}
 
 RegisterNetEvent('rs_phonograph:server:playMusic')
-AddEventHandler('rs_phonograph:server:playMusic', function(uniqueId, coords, url, volume)
-
+AddEventHandler('rs_phonograph:server:playMusic', function(uniqueId, coords, url, volume, loop)
     if currentlyPlaying[uniqueId] then
         currentlyPlaying[uniqueId] = nil
         TriggerClientEvent('rs_phonograph:client:stopMusic', -1, uniqueId)
     end
 
-    currentlyPlaying[uniqueId] = { 
-        url = url, 
-        volume = volume, 
-        coords = coords, 
-        loop = false 
+    currentlyPlaying[uniqueId] = {
+        url = url,
+        volume = volume,
+        coords = coords,
+        loop = loop or false,
+        startTime = os.time()
     }
 
-    TriggerClientEvent('rs_phonograph:client:playMusic', -1, uniqueId, coords, url, volume, false)
+    TriggerClientEvent('rs_phonograph:client:playMusic', -1, uniqueId, coords, url, volume, loop or false, 0)
+end)
+
+RegisterNetEvent('rs_phonograph:server:resetLoop')
+AddEventHandler('rs_phonograph:server:resetLoop', function(uniqueId)
+    if currentlyPlaying[uniqueId] then
+        currentlyPlaying[uniqueId].startTime = os.time()
+    end
 end)
 
 RegisterNetEvent('rs_phonograph:server:stopMusic')
@@ -34,17 +41,25 @@ AddEventHandler('rs_phonograph:server:setVolume', function(uniqueId, newVolume)
     end
 end)
 
-RegisterNetEvent('rs_phonograph:server:soundEnded')
-AddEventHandler('rs_phonograph:server:soundEnded', function(uniqueId)
-    currentlyPlaying[uniqueId] = nil
-end)
-
 RegisterNetEvent('rs_phonograph:server:toggleLoop')
 AddEventHandler('rs_phonograph:server:toggleLoop', function(uniqueId, state)
     local src = source
-    
+    if currentlyPlaying[uniqueId] then
+        currentlyPlaying[uniqueId].loop = state
+        currentlyPlaying[uniqueId].startTime = os.time()
+    end
     TriggerClientEvent('rs_phonograph:client:toggleLoop', -1, uniqueId, state)
     TriggerClientEvent('rs_phonograph:client:notifyLoop', src, state)
+end)
+
+RegisterNetEvent('rs_phonograph:server:syncMusic')
+AddEventHandler('rs_phonograph:server:syncMusic', function()
+    local src = source
+    for uniqueId, data in pairs(currentlyPlaying) do
+        local elapsed = os.time() - data.startTime
+        if elapsed < 0 then elapsed = 0 end
+        TriggerClientEvent('rs_phonograph:client:playMusic', src, uniqueId, data.coords, data.url, data.volume, data.loop, elapsed)
+    end
 end)
 
 local loadedPhonographs = {}
