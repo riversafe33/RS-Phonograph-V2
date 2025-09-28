@@ -187,11 +187,6 @@ Citizen.CreateThread(function()
     end
 end)
 
-RegisterNetEvent("vorp:SelectedCharacter")
-AddEventHandler("vorp:SelectedCharacter", function()
-    TriggerServerEvent('rs_phonograph:server:sendCurrentMusic')
-end)
-
 RegisterNetEvent('rs_phonograph:client:placePropPhonograph')
 AddEventHandler('rs_phonograph:client:placePropPhonograph', function()
     local phonographModel = GetHashKey('p_phonograph01x')
