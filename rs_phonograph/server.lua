@@ -41,6 +41,11 @@ AddEventHandler('rs_phonograph:server:setVolume', function(uniqueId, newVolume)
     end
 end)
 
+RegisterNetEvent('rs_phonograph:server:soundEnded')
+AddEventHandler('rs_phonograph:server:soundEnded', function(uniqueId)
+    currentlyPlaying[uniqueId] = nil
+end)
+
 RegisterNetEvent('rs_phonograph:server:toggleLoop')
 AddEventHandler('rs_phonograph:server:toggleLoop', function(uniqueId, state)
     local src = source
